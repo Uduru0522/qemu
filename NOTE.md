@@ -1,7 +1,11 @@
 ### TODO
 - [ ] Modify QEMU command `hmp_info_balloon` to display balloon info on a node basis
-  - [*] Modify entry for `hmp_info_balloon()` in `/hmp-commands-info.hx`
+  - [ ] Modify entry for `hmp_info_balloon()` in `/hmp-commands-info.hx`
   - [ ] Modify `hmp_info_balloon()` in `/hw/core/machine-hmp-cmds.c` to support per-node ballooning info displaying
+  - [ ] Modify `qmp_query_balloon()` in `/system/balloon.c` to return balloon info containing per-node information
+    - [ ] Modify entry for `struct BalloonInfo` in `/qapi/machine.json` to provide field for per-node info
+    - [ ] Modify `balloon_stat_fn()` (assigned to `virtio_balloon_stat()` by `qemu_add_balloon_handler()`) in `/hw/virtio/virtio-balloon.c` and `/system/balloon.c` to obtain per-node info 
+      - [ ] Modify `get_current_ram_size()` to support passing node id to obtain node-specific ram size
 - [ ] Modify `hmp_balloon()` in `/hw/core/madhine-hmp-cmds.c` to support per-node ballooning
 
 ### Function explaination
