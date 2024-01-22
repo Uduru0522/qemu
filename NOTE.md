@@ -1,5 +1,7 @@
 ### TODO
-- [ ] Modify `hmp_info_balloon()` in `/hw/core/machine-hmp-cmds.c` to support per-node ballooning info displaying
+- [ ] Modify QEMU command `hmp_info_balloon` to display balloon info on a node basis
+  - [*] Modify entry for `hmp_info_balloon()` in `/hmp-commands-info.hx`
+  - [ ] Modify `hmp_info_balloon()` in `/hw/core/machine-hmp-cmds.c` to support per-node ballooning info displaying
 - [ ] Modify `hmp_balloon()` in `/hw/core/madhine-hmp-cmds.c` to support per-node ballooning
 
 ### Function explaination
