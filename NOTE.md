@@ -8,6 +8,7 @@
       - [X] Modify `get_current_ram_size()` to support passing node id to obtain node-specific ram size
       - [X] Modify related files in `hw/hyperv` using generic ballooning functions to allow compiling
 - [ ] Modify `hmp_balloon()` in `/hw/core/madhine-hmp-cmds.c` to support per-node ballooning
+- [ ] Collabrate `hmp_balloon()` and `hmp_info_balloon()` such that QEMU monitor reflets the actual balloon mems
 
 ### Function explaination
 + `balloon_event_fn()` is assigned with some other function (typycally `virtio_balloon_to_target`), used to handle ballooning events. When `balloon <node>` is called in monitor, this function is called 
