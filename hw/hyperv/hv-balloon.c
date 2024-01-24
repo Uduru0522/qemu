@@ -1385,7 +1385,7 @@ static void hv_balloon_vmdev_chan_notify(VMBusChannel *chan)
 static void hv_balloon_stat(void *opaque, BalloonInfo *info)
 {
     HvBalloon *balloon = opaque;
-    info->actual = (hv_balloon_total_ram(balloon) - balloon->removed_both_ctr)
+    info->actual->value = (hv_balloon_total_ram(balloon) - balloon->removed_both_ctr)
         << HV_BALLOON_PFN_SHIFT;
 }
 
