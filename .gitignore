@@ -2,6 +2,8 @@
 /build/
 /.cache/
 /.vscode/
+/test/
+/temp/
 *.pyc
 .sdk
 .stgit-*
