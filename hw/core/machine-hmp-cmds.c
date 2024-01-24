@@ -18,6 +18,7 @@
 #include "monitor/monitor.h"
 #include "qapi/error.h"
 #include "qapi/qapi-builtin-visit.h"
+#include "qapi/qapi-builtin-types.h"
 #include "qapi/qapi-commands-machine.h"
 #include "qapi/qmp/qdict.h"
 #include "qapi/string-output-visitor.h"
@@ -169,13 +170,25 @@ void hmp_info_balloon(Monitor *mon, const QDict *qdict)
 {
     BalloonInfo *info;
     Error *err = NULL;
+    int i, node_nums;
+    intList *cur = NULL;
 
     info = qmp_query_balloon(&err);
     if (hmp_handle_error(mon, err)) {
         return;
     }
 
-    monitor_printf(mon, "balloon: actual=%" PRId64 "\n", info->actual >> 20);
+    node_nums = info->num_nodes;
+    if (node_nums) {  // Is NUMA, print each node
+        for (i = 0, cur = info->actual; cur; ++i, cur = cur->next) {
+            monitor_printf(mon, 
+                "balloon: node %02" PRId32 "/%02" PRId32 ", actual = %" PRId64 "\n", 
+                i, node_nums, cur->value >> 20);
+        }
+    } else {    // Not NUMA, just print total memory
+        monitor_printf(mon, "balloon: actual=%" PRId64 "\n", cur->value >> 20);
+        g_free(cur);
+    }
 
     qapi_free_BalloonInfo(info);
 }

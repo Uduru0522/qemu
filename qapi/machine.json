@@ -1084,12 +1084,13 @@
 #
 # Information about the guest balloon device.
 #
-# @actual: the logical size of the VM in bytes Formula used:
+# @actual: List of the logical size of nodes within the VM in bytes Formula used:
 #     logical_vm_size = vm_ram_size - balloon_size
+# @num-nodes: The total number of nodes within the VM
 #
-# Since: 0.14
+# Since: 0.14 (Modified)
 ##
-{ 'struct': 'BalloonInfo', 'data': {'actual': 'int' } }
+{ 'struct': 'BalloonInfo', 'data': {'actual': ['int'], 'num-nodes': 'int' } }
 
 ##
 # @query-balloon:

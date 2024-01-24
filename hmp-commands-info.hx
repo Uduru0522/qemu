@@ -529,13 +529,13 @@ ERST
         .name       = "balloon",
         .args_type  = "",
         .params     = "",
-        .help       = "show balloon information",
+        .help       = "show balloon information on each node",
         .cmd        = hmp_info_balloon,
     },
 
 SRST
   ``info balloon``
-    Show balloon information.
+    Show balloon information on each node.
 ERST
 
     {

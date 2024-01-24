@@ -23,11 +23,13 @@
 #include "hw/qdev-properties.h"
 #include "hw/boards.h"
 #include "sysemu/balloon.h"
+#include "sysemu/numa.h"
 #include "hw/virtio/virtio-balloon.h"
 #include "exec/address-spaces.h"
 #include "qapi/error.h"
 #include "qapi/qapi-events-machine.h"
 #include "qapi/visitor.h"
+#include "qapi/util.h"
 #include "trace.h"
 #include "qemu/error-report.h"
 #include "migration/misc.h"
@@ -782,8 +784,25 @@ static uint64_t virtio_balloon_get_features(VirtIODevice *vdev, uint64_t f,
 static void virtio_balloon_stat(void *opaque, BalloonInfo *info)
 {
     VirtIOBalloon *dev = opaque;
-    info->actual = get_current_ram_size() - ((uint64_t) dev->actual <<
+    MachineState *machine = MACHINE(qdev_get_machine());
+    int i, num_nodes = machine->numa_state ? machine->numa_state->num_nodes : 0;
+    NumaNodeMem *node_mem;
+    intList *head = NULL, **tail = &head;
+
+    info->num_nodes = num_nodes;
+
+    if (num_nodes) {    // Is NUMA
+        node_mem = g_new0(NumaNodeMem, num_nodes);
+        query_numa_node_mem(node_mem, machine);
+        for (i = 0; i < num_nodes; ++i) {
+            QAPI_LIST_APPEND(tail, node_mem[i].node_mem);
+        }
+        info->actual = head;
+    } else {    // Not NUMA
+        info->actual = g_malloc0(sizeof(intList));
+        info->actual->value = get_current_ram_size() - ((uint64_t) dev->actual <<
                                              VIRTIO_BALLOON_PFN_SHIFT);
+    }
 }
 
 static void virtio_balloon_to_target(void *opaque, ram_addr_t target)
