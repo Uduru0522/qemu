@@ -90,7 +90,7 @@ BalloonInfo *qmp_query_balloon(Error **errp)
     return info;
 }
 
-void qmp_balloon(int64_t value, Error **errp)
+void qmp_balloon(int64_t value, int64_t node_id, Error **errp)
 {
     if (!have_balloon(errp)) {
         return;
@@ -101,6 +101,11 @@ void qmp_balloon(int64_t value, Error **errp)
         return;
     }
 
+    if (node_id < 0){
+        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "node_id", "a non-negative integer");
+        return;
+    }
+
     trace_balloon_event(balloon_opaque, value);
-    balloon_event_fn(balloon_opaque, value);
+    balloon_event_fn(balloon_opaque, value, node_id);
 }

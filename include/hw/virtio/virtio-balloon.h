@@ -44,8 +44,8 @@ struct VirtIOBalloon {
     VirtIODevice parent_obj;
     VirtQueue *ivq, *dvq, *svq, *free_page_vq, *reporting_vq;
     uint32_t free_page_hint_status;
-    uint32_t num_pages;
-    uint32_t actual;
+    uint32_t *num_pages;
+    uint32_t *actual;
     uint32_t free_page_hint_cmd_id;
     uint64_t stats[VIRTIO_BALLOON_S_NR];
     VirtQueueElement *stats_vq_elem;

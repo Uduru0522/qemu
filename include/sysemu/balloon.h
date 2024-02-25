@@ -17,7 +17,7 @@
 #include "exec/cpu-common.h"
 #include "qapi/qapi-types-machine.h"
 
-typedef void (QEMUBalloonEvent)(void *opaque, ram_addr_t target);
+typedef void (QEMUBalloonEvent)(void *opaque, ram_addr_t target, int64_t node_id);
 typedef void (QEMUBalloonStatus)(void *opaque, BalloonInfo *info);
 
 int qemu_add_balloon_handler(QEMUBalloonEvent *event_func,

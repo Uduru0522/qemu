@@ -1384,7 +1384,7 @@ ERST
 
     {
         .name       = "balloon",
-        .args_type  = "value:M",
+        .args_type  = "value:M,node:i",
         .params     = "target",
         .help       = "request VM to change its memory allocation (in MB)",
         .cmd        = hmp_balloon,

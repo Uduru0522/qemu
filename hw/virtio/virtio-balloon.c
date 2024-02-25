@@ -732,14 +732,21 @@ static void virtio_balloon_get_config(VirtIODevice *vdev, uint8_t *config_data)
     memcpy(config_data, &config, virtio_balloon_config_size(dev));
 }
 
-static ram_addr_t get_current_ram_size(void)
+static ram_addr_t get_current_ram_size(int64_t node_id)
 {
     MachineState *machine = MACHINE(qdev_get_machine());
-    if (machine->device_memory) {
-        return machine->ram_size + machine->device_memory->dimm_size;
+
+    if (node_id < 0) {
+        // Get all ram
+        if (machine->device_memory) {
+            return machine->ram_size + machine->device_memory->dimm_size;
+        } else {
+            return machine->ram_size;
+        }
     } else {
-        return machine->ram_size;
+        return machine->numa_state->nodes[node_id].node_mem;
     }
+    
 }
 
 static bool virtio_balloon_page_poison_support(void *opaque)
@@ -800,25 +807,28 @@ static void virtio_balloon_stat(void *opaque, BalloonInfo *info)
         info->actual = head;
     } else {    // Not NUMA
         info->actual = g_malloc0(sizeof(intList));
-        info->actual->value = get_current_ram_size() - ((uint64_t) dev->actual <<
+        info->actual->value = get_current_ram_size(-1) - ((uint64_t) dev->actual <<
                                              VIRTIO_BALLOON_PFN_SHIFT);
     }
 }
 
-static void virtio_balloon_to_target(void *opaque, ram_addr_t target)
+static void virtio_balloon_to_target(void *opaque, ram_addr_t target, int64_t node_id)
 {
     VirtIOBalloon *dev = VIRTIO_BALLOON(opaque);
     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
     ram_addr_t vm_ram_size = get_current_ram_size();
 
+    // Cannot exceed max size of machine physical ram
     if (target > vm_ram_size) {
         target = vm_ram_size;
     }
+
+    // Get number of pages to add to balloon and notify change
     if (target) {
-        dev->num_pages = (vm_ram_size - target) >> VIRTIO_BALLOON_PFN_SHIFT;
+        dev->num_pages[node_id] = (vm_ram_size - target) >> VIRTIO_BALLOON_PFN_SHIFT;
         virtio_notify_config(vdev);
     }
-    trace_virtio_balloon_to_target(target, dev->num_pages);
+    trace_virtio_balloon_to_target(target, dev->num_pages[node_id]);
 }
 
 static int virtio_balloon_post_load_device(void *opaque, int version_id)
